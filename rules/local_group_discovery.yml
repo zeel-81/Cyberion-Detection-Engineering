@@ -1,0 +1,21 @@
+title: Local Group Membership Enumeration
+id: 3a8f1c62-7d45-4b91-9e23-6c5f0a817d34
+status: test
+description: Detects Windows Security Event 4799 indicating enumeration of security-enabled local group membership.
+references:
+  - https://attack.mitre.org/techniques/T1069/001/
+tags:
+  - attack.discovery
+  - attack.t1069.001
+logsource:
+  product: windows
+  service: security
+detection:
+  selection:
+    EventID: 4799
+    Provider_Name: Microsoft-Windows-Security-Auditing
+  condition: selection
+falsepositives:
+  - Legitimate administrative activity
+  - Security and management software
+level: medium
