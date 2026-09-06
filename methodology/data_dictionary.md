@@ -1,54 +1,37 @@
 # Cyberion Detection Engineering — Data Dictionary
 
-## Telemetry Source 1: Windows Security Event Log
+## Telemetry Source 1: Windows Sysmon
+
+### Sample
+UACME_59_Sysmon.evtx
+
+### Purpose
+Provides endpoint telemetry for process execution, process relationships, file and network activity, and other host-level detection opportunities.
+
+### Observed Event IDs
+To be documented from the dataset.
+
+### Observed Fields
+To be populated from the parsed Sysmon sample.
+
+### Detection Use
+Used to detect suspicious process execution, command-line activity, parent-child relationships, network connections, and other endpoint behaviors.
+
+## Telemetry Source 2: Windows Security Event Log
 
 ### Sample
 EVTX-ATTACK-SAMPLES
 
 ### Event
-Windows Scheduled Task Creation (Event ID 4698)
-
-### Fields
-- EventID:
-- TimeCreated:
-- Computer:
-- SubjectUserName:
-- SubjectDomainName:
-- TaskName:
-- TaskContent:
+4698 — Scheduled Task Creation
 
 ### Detection Use
-Used to identify creation of scheduled tasks that may be used for persistence or execution.
+Used to identify scheduled task creation that may indicate execution or persistence.
 
----
+## Telemetry Source 3
 
-## Telemetry Source 2: Sysmon
-
-### Sample
-UACME_59_Sysmon.evtx
-
-### Fields
-- EventID:
-- Image:
-- CommandLine:
-- ParentImage:
-- ParentCommandLine:
-- User:
-- ProcessId:
-- ParentProcessId:
-- Hashes:
-- DestinationIp:
-- DestinationPort:
+### Source
+To be selected and documented.
 
 ### Detection Use
-Used for process execution, parent-child relationships, command-line activity and network-related detections.
-
----
-
-## Telemetry Source 3: Windows Event / Other
-
-### Source:
-To be finalized after dataset inspection.
-
-### Detection Use
-To be documented after selecting the third telemetry source.
+To be determined after source selection.
