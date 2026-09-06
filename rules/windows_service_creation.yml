@@ -1,0 +1,28 @@
+title: Suspicious Windows Service Creation
+id: 8f3c2a17-5d64-4c91-a7e2-1b6d93f40528
+status: test
+description: Detects Windows service creation events with a service image path using command interpreter or other suspicious execution paths.
+references:
+  - https://attack.mitre.org/techniques/T1543/003/
+tags:
+  - attack.persistence
+  - attack.privilege-escalation
+  - attack.t1543.003
+logsource:
+  product: windows
+  service: system
+detection:
+  selection:
+    EventID: 7045
+    Provider_Name: Service Control Manager
+  suspicious_path:
+    ImagePath|contains:
+      - 'cmd.exe'
+      - 'powershell.exe'
+      - 'pwsh.exe'
+  condition: selection and suspicious_path
+falsepositives:
+  - Legitimate software installation
+  - Authorized service deployment
+  - System administration activity
+level: high
