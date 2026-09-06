@@ -1,0 +1,21 @@
+title: Windows Event Log Cleared
+id: 7c2e91a4-3d56-4b80-a17f-92e6c5f04831
+status: test
+description: Detects Windows Event Log service events indicating that the system event log was cleared.
+references:
+  - https://attack.mitre.org/techniques/T1070/001/
+tags:
+  - attack.defense-evasion
+  - attack.t1070.001
+logsource:
+  product: windows
+  service: system
+detection:
+  selection:
+    EventID: 104
+    Provider_Name: Microsoft-Windows-Eventlog
+  condition: selection
+falsepositives:
+  - Authorized administrative log clearing
+  - System maintenance or troubleshooting
+level: high
