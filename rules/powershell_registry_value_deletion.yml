@@ -1,0 +1,24 @@
+title: PowerShell Registry Value Deletion
+id: 6e4b9c31-2d74-4f8a-a921-7c5d1e6b8340
+status: test
+description: Detects PowerShell activity associated with registry value deletion using Sysmon Event ID 12.
+references:
+  - https://attack.mitre.org/techniques/T1112/
+tags:
+  - attack.defense-evasion
+  - attack.t1112
+logsource:
+  product: windows
+  category: registry_event
+  service: sysmon
+detection:
+  selection:
+    EventType: DeleteValue
+    Image|endswith:
+      - '\powershell.exe'
+      - '\pwsh.exe'
+  condition: selection
+falsepositives:
+  - Legitimate PowerShell administration
+  - Software configuration changes
+level: medium
