@@ -1,37 +1,53 @@
 # Cyberion Detection Engineering — Data Dictionary
 
-## Telemetry Source 1: Windows Sysmon
+## 1. Microsoft-Windows-Sysmon
 
 ### Sample
 UACME_59_Sysmon.evtx
 
-### Purpose
-Provides endpoint telemetry for process execution, process relationships, file and network activity, and other host-level detection opportunities.
+### Description
+Sysmon provides endpoint telemetry about process execution, process relationships, command-line activity, and network-related activity.
 
-### Observed Event IDs
-To be documented from the dataset.
-
-### Observed Fields
-To be populated from the parsed Sysmon sample.
+### Observed Provider
+Microsoft-Windows-Sysmon
 
 ### Detection Use
-Used to detect suspicious process execution, command-line activity, parent-child relationships, network connections, and other endpoint behaviors.
+Used for endpoint detection such as suspicious process execution, parent-child process relationships, command-line activity, and network connections.
 
-## Telemetry Source 2: Windows Security Event Log
+---
+
+## 2. Microsoft-Windows-Security-Auditing
 
 ### Sample
-EVTX-ATTACK-SAMPLES
+Execution/temp_scheduled_task_4698_4699.evtx
 
-### Event
-4698 — Scheduled Task Creation
+### Description
+Windows Security auditing events provide security-relevant activity recorded by the Windows Security event log.
 
-### Detection Use
-Used to identify scheduled task creation that may indicate execution or persistence.
+### Observed Provider
+Microsoft-Windows-Security-Auditing
 
-## Telemetry Source 3
-
-### Source
-To be selected and documented.
+### Important Event
+4698 — Scheduled Task Created
 
 ### Detection Use
-To be determined after source selection.
+Used to detect creation of scheduled tasks that may indicate execution or persistence.
+
+---
+
+## 3. Service Control Manager
+
+### Sample
+Defense Evasion/DE_WinEventLogSvc_Crash_System_7036.evtx
+
+### Description
+Service Control Manager records Windows service state and service-related activity in the System event log.
+
+### Observed Provider
+Service Control Manager
+
+### Important Event
+7036 — Service entered a running/stopped state
+
+### Detection Use
+Used to investigate suspicious service activity, service state changes, and potential service-based execution or persistence.
