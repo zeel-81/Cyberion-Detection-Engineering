@@ -1,0 +1,21 @@
+title: Windows Scheduled Task Creation
+id: 8f3c1d2a-7b6e-4c91-a531-2e8f4b9d6c10
+status: test
+description: Detects creation of a Windows scheduled task through Security Event ID 4698.
+references:
+  - https://attack.mitre.org/techniques/T1053/005/
+tags:
+  - attack.execution
+  - attack.persistence
+  - attack.t1053.005
+logsource:
+  product: windows
+  service: security
+detection:
+  selection:
+    EventID: 4698
+  condition: selection
+falsepositives:
+  - Legitimate administrative task creation
+  - Software installers creating scheduled tasks
+level: medium
