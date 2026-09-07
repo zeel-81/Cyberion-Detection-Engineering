@@ -1,0 +1,25 @@
+title: Suspicious PowerShell LSASS Dump Script
+id: 5a7e2c91-4d63-48b0-a816-93f4c7e052bd
+status: test
+description: Detects PowerShell Script Block Logging events containing indicators associated with LSASS memory dumping through MiniDumpWriteDump.
+references:
+  - https://attack.mitre.org/techniques/T1059/001/
+tags:
+  - attack.execution
+  - attack.credential-access
+  - attack.t1059.001
+logsource:
+  product: windows
+  service: powershell
+detection:
+  selection:
+    EventID: 4104
+    ScriptBlockText|contains|all:
+      - 'MiniDumpWriteDump'
+      - 'lsass'
+  condition: selection
+falsepositives:
+  - Authorized credential-security testing
+  - Legitimate forensic or diagnostic tooling
+  - Security research in an isolated lab
+level: high
