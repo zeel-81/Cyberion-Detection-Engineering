@@ -1,0 +1,24 @@
+title: WMI Provider Host Child Process
+id: 7e4c1a92-63f5-4db8-a271-95c0f8372e64
+status: test
+description: Detects process creation where WmiPrvSE.exe is the parent process, which may indicate Windows Management Instrumentation execution.
+references:
+  - https://attack.mitre.org/techniques/T1047/
+tags:
+  - attack.execution
+  - attack.lateral-movement
+  - attack.t1047
+logsource:
+  product: windows
+  category: process_creation
+  service: sysmon
+detection:
+  selection:
+    EventID: 1
+    ParentImage|endswith: '\WmiPrvSE.exe'
+  condition: selection
+falsepositives:
+  - Legitimate WMI administration
+  - Monitoring and management software
+  - Enterprise automation
+level: high
