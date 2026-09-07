@@ -1,0 +1,27 @@
+title: IIS Worker Process Local RDP Connection
+id: 6b1e4f92-83c7-4d05-a6f1-29ce7b548d31
+status: test
+description: Detects an IIS worker process making a TCP connection to the local RDP port, which may indicate tunneled or proxied RDP activity.
+references:
+  - https://attack.mitre.org/techniques/T1090/001/
+  - https://attack.mitre.org/techniques/T1021/001/
+tags:
+  - attack.command-and-control
+  - attack.t1090.001
+  - attack.lateral-movement
+  - attack.t1021.001
+logsource:
+  product: windows
+  category: network_connection
+  service: sysmon
+detection:
+  selection:
+    EventID: 3
+    Image|endswith: '\w3wp.exe'
+    DestinationIp: 127.0.0.1
+    DestinationPort: 3389
+  condition: selection
+falsepositives:
+  - Legitimate IIS applications using local RDP-related services
+  - Authorized security testing
+level: high
