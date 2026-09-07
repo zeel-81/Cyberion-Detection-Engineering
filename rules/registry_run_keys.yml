@@ -1,0 +1,25 @@
+title: Registry Run Key Persistence
+id: 6b4e91d2-83f7-4a50-bc21-5d7e09f31468
+status: test
+description: Detects Sysmon registry value set events targeting Windows Registry Run keys, which may indicate persistence.
+references:
+  - https://attack.mitre.org/techniques/T1547/001/
+tags:
+  - attack.persistence
+  - attack.t1547.001
+logsource:
+  product: windows
+  category: registry_set
+  service: sysmon
+detection:
+  selection:
+    EventID: 13
+    TargetObject|contains:
+      - '\Software\Microsoft\Windows\CurrentVersion\Run\'
+      - '\Software\Microsoft\Windows\CurrentVersion\RunOnce\'
+  condition: selection
+falsepositives:
+  - Legitimate software installation
+  - Authorized application startup configuration
+  - Enterprise software deployment
+level: high
