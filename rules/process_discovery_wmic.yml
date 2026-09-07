@@ -1,0 +1,26 @@
+title: WMIC Process Discovery
+id: 2f6c8a41-9d73-4b05-ae21-58c4d7f93160
+status: test
+description: Detects WMIC process listing activity that may indicate process discovery.
+references:
+  - https://attack.mitre.org/techniques/T1057/
+tags:
+  - attack.discovery
+  - attack.t1057
+logsource:
+  product: windows
+  category: process_creation
+  service: sysmon
+detection:
+  selection:
+    EventID: 1
+    Image|endswith:
+      - '\wmic.exe'
+    CommandLine|contains|all:
+      - 'process'
+      - 'list'
+  condition: selection
+falsepositives:
+  - Legitimate administrative process inventory
+  - Monitoring and management software
+level: medium
