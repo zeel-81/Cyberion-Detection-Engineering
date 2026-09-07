@@ -1,0 +1,23 @@
+title: Windows User Account Creation
+id: 73c1a9e4-5f28-46b7-b031-9d64c8a27f15
+status: test
+description: Detects Windows Security Event 4720 indicating creation of a new user account.
+references:
+  - https://attack.mitre.org/techniques/T1136/
+  - https://learn.microsoft.com/en-us/previous-versions/windows/it-pro/windows-10/security/threat-protection/auditing/event-4720
+tags:
+  - attack.persistence
+  - attack.t1136
+logsource:
+  product: windows
+  service: security
+detection:
+  selection:
+    EventID: 4720
+    Provider_Name: Microsoft-Windows-Security-Auditing
+  condition: selection
+falsepositives:
+  - Legitimate user provisioning
+  - Service account creation
+  - Authorized administrative activity
+level: medium
