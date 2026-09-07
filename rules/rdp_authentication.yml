@@ -1,0 +1,21 @@
+title: Remote Desktop Authentication
+id: 4d8a71c3-2f65-4b90-ae17-9c5362d84f01
+status: test
+description: Detects Remote Desktop Services Event ID 1149 from the RemoteConnectionManager provider.
+references:
+  - https://attack.mitre.org/techniques/T1021/001/
+tags:
+  - attack.lateral-movement
+  - attack.t1021.001
+logsource:
+  product: windows
+  service: terminalservices-remoteconnectionmanager
+detection:
+  selection:
+    EventID: 1149
+    Provider_Name: Microsoft-Windows-TerminalServices-RemoteConnectionManager
+  condition: selection
+falsepositives:
+  - Legitimate Remote Desktop access
+  - Authorized administrative activity
+level: medium
