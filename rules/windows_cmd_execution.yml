@@ -1,0 +1,23 @@
+title: Windows Command Shell Execution
+id: 91c4e7a2-5b36-4d80-a1f9-63e82b74c5d0
+status: test
+description: Detects Windows Command Shell execution using Sysmon process creation telemetry.
+references:
+  - https://attack.mitre.org/techniques/T1059/003/
+tags:
+  - attack.execution
+  - attack.t1059.003
+logsource:
+  product: windows
+  category: process_creation
+  service: sysmon
+detection:
+  selection:
+    EventID: 1
+    Image|endswith:
+      - '\cmd.exe'
+  condition: selection
+falsepositives:
+  - Legitimate administrative command execution
+  - System scripts and software installers
+level: medium
