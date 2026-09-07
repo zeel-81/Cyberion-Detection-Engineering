@@ -1,0 +1,24 @@
+title: Local Group Membership Addition
+id: 5d7a2c91-4e63-4f80-b9a1-6382ce0475f6
+status: test
+description: Detects Windows Security Event 4732 indicating that a member was added to a security-enabled local group.
+references:
+  - https://attack.mitre.org/techniques/T1098/007/
+  - https://learn.microsoft.com/en-us/previous-versions/windows/it-pro/windows-10/security/threat-protection/auditing/event-4732
+tags:
+  - attack.persistence
+  - attack.privilege-escalation
+  - attack.t1098.007
+logsource:
+  product: windows
+  service: security
+detection:
+  selection:
+    EventID: 4732
+    Provider_Name: Microsoft-Windows-Security-Auditing
+  condition: selection
+falsepositives:
+  - Legitimate administrator group management
+  - Authorized software installation or provisioning
+  - Enterprise identity-management activity
+level: high
