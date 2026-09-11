@@ -1,0 +1,5 @@
+RDP/IIS Correlation Rule Validation
+Sigma validation: PASS
+Errors: 0
+Condition errors: 0
+Validation issues: 0

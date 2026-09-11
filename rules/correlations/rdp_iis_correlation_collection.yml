@@ -1,0 +1,70 @@
+title: Remote Desktop Authentication
+name: rdp_authentication
+id: 4d8a71c3-2f65-4b90-ae17-9c5362d84f01
+status: test
+description: Detects Remote Desktop Services Event ID 1149 from the RemoteConnectionManager provider.
+references:
+  - https://attack.mitre.org/techniques/T1021/001/
+tags:
+  - attack.t1021.001
+logsource:
+  product: windows
+  service: terminalservices-remoteconnectionmanager
+detection:
+  selection:
+    EventID: 1149
+    Provider_Name: Microsoft-Windows-TerminalServices-RemoteConnectionManager
+  condition: selection
+falsepositives:
+  - Legitimate Remote Desktop access
+  - Authorized administrative activity
+level: medium
+
+---
+title: IIS Worker Process Local RDP Connection
+name: iis_local_rdp_tunnel
+id: 6b1e4f92-83c7-4d05-a6f1-29ce7b548d31
+status: test
+description: Detects an IIS worker process making a TCP connection to the local RDP port, which may indicate tunneled or proxied RDP activity.
+references:
+  - https://attack.mitre.org/techniques/T1090/001/
+  - https://attack.mitre.org/techniques/T1021/001/
+tags:
+  - attack.t1090.001
+  - attack.t1021.001
+logsource:
+  category: network_connection
+detection:
+  selection:
+    EventID: 3
+    Image|endswith: '\w3wp.exe'
+    DestinationIp: 127.0.0.1
+    DestinationPort: 3389
+  condition: selection
+falsepositives:
+  - Legitimate IIS applications using local RDP-related services
+  - Authorized security testing
+level: high
+
+---
+title: RDP Authentication Followed by IIS Local RDP Activity
+id: 9f3b7c21-5d84-4e16-a2c9-71f6b83d4e52
+name: correlation_rdp_iis
+status: experimental
+description: Correlates a Remote Desktop authentication with subsequent IIS worker process activity to the local RDP port.
+references:
+    - https://attack.mitre.org/techniques/T1021/001/
+tags:
+    - attack.t1021.001
+correlation:
+    type: temporal_ordered
+    rules:
+        - rdp_authentication
+        - iis_local_rdp_tunnel
+    group-by:
+        - Computer
+    timespan: 5m
+falsepositives:
+    - Legitimate administrative RDP sessions involving IIS systems
+    - Authorized security testing
+level: medium

@@ -1,0 +1,13 @@
+RDP Authentication Rule - False Positive Review
+- Legitimate Remote Desktop access may generate Event ID 1149.
+- Authorized administrative RDP activity may generate the same telemetry.
+- These activities can produce expected alerts and should be reviewed before escalation.
+
+IIS Local RDP Rule - False Positive Review
+- Legitimate IIS applications may establish local connections related to RDP services.
+- Authorized security testing may generate the same network telemetry.
+- Because the exact w3wp.exe -> 127.0.0.1:3389 pattern had 0 matches in the supplied dataset, no false-positive instance was observed during testing.
+
+Severity Rationale
+- RDP authentication: Medium because legitimate administrative activity can trigger the rule.
+- IIS local RDP activity: High because the specific behavior may indicate tunneled or proxied RDP activity.

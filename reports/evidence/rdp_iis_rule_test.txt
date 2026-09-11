@@ -1,0 +1,9 @@
+RDP Authentication Rule Test
+Event ID 1149 found: 11
+Provider: Microsoft-Windows-TerminalServices-RemoteConnectionManager
+Result: Matching RDP authentication telemetry found
+
+IIS Local RDP Rule Test
+Event ID 3 found: 421
+Exact match: w3wp.exe -> 127.0.0.1:3389
+Result: 0 matching events found in dataset
