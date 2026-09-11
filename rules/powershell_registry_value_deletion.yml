@@ -5,7 +5,6 @@ description: Detects PowerShell activity associated with registry value deletion
 references:
   - https://attack.mitre.org/techniques/T1112/
 tags:
-  - attack.defense-evasion
   - attack.t1112
 logsource:
   product: windows

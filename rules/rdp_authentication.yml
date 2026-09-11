@@ -1,4 +1,5 @@
 title: Remote Desktop Authentication
+name: rdp_authentication
 id: 4d8a71c3-2f65-4b90-ae17-9c5362d84f01
 status: test
 description: Detects Remote Desktop Services Event ID 1149 from the RemoteConnectionManager provider.

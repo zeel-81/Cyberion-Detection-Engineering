@@ -1,4 +1,5 @@
 title: IIS Worker Process Local RDP Connection
+name: iis_local_rdp_tunnel
 id: 6b1e4f92-83c7-4d05-a6f1-29ce7b548d31
 status: test
 description: Detects an IIS worker process making a TCP connection to the local RDP port, which may indicate tunneled or proxied RDP activity.
@@ -11,9 +12,7 @@ tags:
   - attack.lateral-movement
   - attack.t1021.001
 logsource:
-  product: windows
   category: network_connection
-  service: sysmon
 detection:
   selection:
     EventID: 3

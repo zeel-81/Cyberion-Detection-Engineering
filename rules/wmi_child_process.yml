@@ -9,9 +9,7 @@ tags:
   - attack.lateral-movement
   - attack.t1047
 logsource:
-  product: windows
   category: process_creation
-  service: sysmon
 detection:
   selection:
     EventID: 1

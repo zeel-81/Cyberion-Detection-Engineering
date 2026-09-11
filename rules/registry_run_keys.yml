@@ -8,9 +8,7 @@ tags:
   - attack.persistence
   - attack.t1547.001
 logsource:
-  product: windows
   category: registry_set
-  service: sysmon
 detection:
   selection:
     EventID: 13
