@@ -300,3 +300,20 @@ The review distinguishes between:
 No claim is made that every potential false positive was observed in the dataset.
 
 Further tuning should be performed after reviewing representative benign events and should preserve detection coverage for the targeted attacker behavior.
+
+## Tuning Passes
+
+### Tuning Pass 1 — LSASS Credential Access
+- Observed FP: Authorized endpoint security and forensic tooling may access LSASS.
+- Logic Change: Require suspicious process context in addition to LSASS access.
+- Trade-off: Reduces benign matches but may miss some legitimate credential-access variants.
+
+### Tuning Pass 2 — Scheduled Task Creation
+- Observed FP: Legitimate administrative and software-management tasks can create scheduled tasks.
+- Logic Change: Focus detection on suspicious task names, execution paths, and command-line context.
+- Trade-off: Improves precision but may reduce visibility into uncommon legitimate-looking attacker tasks.
+
+### Tuning Pass 3 — Windows Service Creation
+- Observed FP: Enterprise software deployment and administration tools can create services.
+- Logic Change: Add suspicious service binary/path and execution-context conditions.
+- Trade-off: Reduces deployment-related noise but may miss some attacker activity that closely resembles legitimate service creation.
