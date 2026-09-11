@@ -2,26 +2,26 @@
 
 | Rule    | Detection                               | ATT&CK Technique                                                      | Technique ID | Status | Validation Evidence   |
 | ------- | --------------------------------------- | --------------------------------------------------------------------- | ------------ | ------ | --------------------- |
-| Rule 01 | Scheduled Task Creation                 | Scheduled Task/Job: Scheduled Task                                    | T1053.005    | Tested | EVTX Event 4698       |
-| Rule 02 | PowerShell Registry Value Deletion      | Modify Registry                                                       | T1112        | Tested | Sysmon Event 12       |
-| Rule 03 | Windows Service Creation                | Windows Service                                                       | T1543.003    | Tested | System Event 7045     |
-| Rule 04 | Windows Event Log Cleared               | Indicator Removal: Clear Windows Event Logs                           | T1070.001    | Tested | Event 104             |
-| Rule 05 | Local Group Membership Enumeration      | Permission Groups Discovery: Local Windows Groups                     | T1069.001    | Tested | Security Event 4799   |
-| Rule 06 | Windows Command Shell Execution         | Command and Scripting Interpreter: Windows Command Shell              | T1059.003    | Tested | Sysmon Event 1        |
-| Rule 07 | Local Group Membership Addition         | Account Manipulation: Additional Local or Domain Groups               | T1098.007    | Tested | Security Event 4732   |
-| Rule 08 | WMIC Process Discovery                  | Process Discovery                                                     | T1057        | Tested | Sysmon Event 1        |
-| Rule 09 | IIS Local RDP Connection                | Proxy: Internal Proxy                                                 | T1090.001    | Tested | Sysmon Event 3        |
-| Rule 10 | RDP Authentication                      | Remote Services: Remote Desktop Protocol                              | T1021.001    | Tested | Event 1149            |
-| Rule 11 | Suspicious LSASS Process Access         | OS Credential Dumping: LSASS Memory                                   | T1003.001    | Tested | Sysmon Event 10       |
-| Rule 12 | Registry Run Key Persistence            | Boot or Logon Autostart Execution: Registry Run Keys / Startup Folder | T1547.001    | Tested | Sysmon Event 13       |
-| Rule 13 | WMI Provider Host Child Process         | Windows Management Instrumentation                                    | T1047        | Tested | Sysmon Event 1        |
-| Rule 14 | Windows User Account Creation           | Create Account                                                        | T1136        | Tested | Security Event 4720   |
-| Rule 15 | Suspicious PowerShell LSASS Dump Script | Command and Scripting Interpreter: PowerShell                         | T1059.001    | Tested | PowerShell Event 4104 |
-| Gap 01 | System Network Configuration Discovery | System Network Configuration Discovery | T1016 | Assessed — Gap | No dedicated rule/test |
-| Gap 02 | System Network Connections Discovery | System Network Connections Discovery | T1049 | Assessed — Gap | No dedicated rule/test |
-| Gap 03 | System Information Discovery | System Information Discovery | T1082 | Assessed — Gap | No dedicated rule/test |
-| Gap 04 | System Owner/User Discovery | System Owner/User Discovery | T1033 | Assessed — Gap | No dedicated rule/test |
-| Gap 05 | Remote System Discovery | Remote System Discovery | T1018 | Assessed — Gap | No dedicated rule/test |
+| Rule 01 | Scheduled Task Creation                 | Scheduled Task/Job: Scheduled Task                                    | T1053.005    | Covered | EVTX Event 4698       |
+| Rule 02 | PowerShell Registry Value Deletion      | Modify Registry                                                       | T1112        | Covered | Sysmon Event 12       |
+| Rule 03 | Windows Service Creation                | Windows Service                                                       | T1543.003    | Covered | System Event 7045     |
+| Rule 04 | Windows Event Log Cleared               | Indicator Removal: Clear Windows Event Logs                           | T1070.001    | Covered | Event 104             |
+| Rule 05 | Local Group Membership Enumeration      | Permission Groups Discovery: Local Windows Groups                     | T1069.001    | Covered | Security Event 4799   |
+| Rule 06 | Windows Command Shell Execution         | Command and Scripting Interpreter: Windows Command Shell              | T1059.003    | Covered | Sysmon Event 1        |
+| Rule 07 | Local Group Membership Addition         | Account Manipulation: Additional Local or Domain Groups               | T1098.007    | Covered | Security Event 4732   |
+| Rule 08 | WMIC Process Discovery                  | Process Discovery                                                     | T1057        | Covered | Sysmon Event 1        |
+| Rule 09 | IIS Local RDP Connection                | Proxy: Internal Proxy                                                 | T1090.001    | Covered | Sysmon Event 3        |
+| Rule 10 | RDP Authentication                      | Remote Services: Remote Desktop Protocol                              | T1021.001    | Covered | Event 1149            |
+| Rule 11 | Suspicious LSASS Process Access         | OS Credential Dumping: LSASS Memory                                   | T1003.001    | Covered | Sysmon Event 10       |
+| Rule 12 | Registry Run Key Persistence            | Boot or Logon Autostart Execution: Registry Run Keys / Startup Folder | T1547.001    | Covered | Sysmon Event 13       |
+| Rule 13 | WMI Provider Host Child Process         | Windows Management Instrumentation                                    | T1047        | Covered | Sysmon Event 1        |
+| Rule 14 | Windows User Account Creation           | Create Account                                                        | T1136        | Covered | Security Event 4720   |
+| Rule 15 | Suspicious PowerShell LSASS Dump Script | Command and Scripting Interpreter: PowerShell                         | T1059.001    | Covered | PowerShell Event 4104 |
+| Gap 01 | System Network Configuration Discovery | System Network Configuration Discovery | T1016 | Not Covered | No dedicated rule/test |
+| Gap 02 | System Network Connections Discovery | System Network Connections Discovery | T1049 | Not Covered | No dedicated rule/test |
+| Gap 03 | System Information Discovery | System Information Discovery | T1082 | Not Covered | No dedicated rule/test |
+| Gap 04 | System Owner/User Discovery | System Owner/User Discovery | T1033 | Not Covered | No dedicated rule/test |
+| Gap 05 | Remote System Discovery | Remote System Discovery | T1018 | Not Covered | No dedicated rule/test |
 
 ## Coverage Summary
 

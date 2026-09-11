@@ -1,0 +1,20 @@
+title: PowerShell LSASS Activity Followed by LSASS Process Access
+name: correlation_powershell_lsass
+id: 7c4d2a18-91e6-4f53-a872-63b0e5d91c27
+status: experimental
+description: Correlates suspicious PowerShell LSASS activity with subsequent LSASS process access on the same host.
+tags:
+  - attack.t1059.001
+  - attack.t1003.001
+correlation:
+  type: temporal_ordered
+  rules:
+    - powershell_lsass_scriptblock
+    - lsass_credential_access
+  group-by:
+    - Computer
+  timespan: 5m
+falsepositives:
+  - Authorized security testing
+  - Endpoint security tooling
+level: high

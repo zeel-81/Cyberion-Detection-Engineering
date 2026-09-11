@@ -1,0 +1,20 @@
+title: User Account Creation Followed by Group Membership Change
+name: correlation_user_group_escalation
+id: 2a7e9f61-5d31-4c72-b8e4-91f2a6d03c44
+status: experimental
+description: Correlates creation of a Windows user account with a subsequent local group membership change on the same host.
+tags:
+  - attack.t1136
+  - attack.t1098.007
+correlation:
+  type: temporal_ordered
+  rules:
+    - user_account_creation
+    - local_group_membership_change
+  group-by:
+    - Computer
+  timespan: 10m
+falsepositives:
+  - Legitimate user provisioning
+  - Authorized group assignment
+level: high
