@@ -15,7 +15,7 @@ EVTX-ATTACK-SAMPLES
 Hunt 02 — WinRM / PowerShell Remoting Lateral Movement
 
 ### Initial Classification
-Suspicious Activity — Requires Additional Corroboration
+Confirmed Detection — WinRM Remote-Shell Execution Activity
 
 ---
 
