@@ -15,7 +15,7 @@ EVTX-ATTACK-SAMPLES
 Hunt 01 — LSASS Process Access
 
 ### Initial Classification
-Suspicious Activity — Requires Investigation
+Confirmed Detection — LSASS Credential Access Activity
 
 ---
 
@@ -44,11 +44,47 @@ The investigation therefore focused on determining whether the observed LSASS ac
 
 ### Primary Evidence
 
+**Sysmon Event ID 1 — Process Creation**
+
+The suspicious process was created as:
+
+- Image: `c:\Users\Public\BYOV\ZAM64\ppldump.exe`
+- Process ID: `5016`
+- Process GUID: `{747f3d96-2b98-5e41-0000-00109c904700}`
+- Description: `ppldump.exe -p lsass.exe -o a.png`
+
 **Sysmon Event ID 10 — Process Access**
 
-The event records access from `ppldump.exe` to `lsass.exe` with:
+The same process accessed LSASS:
 
-`GrantedAccess = 0x001fffff`
+- SourceImage: `c:\Users\Public\BYOV\ZAM64\ppldump.exe`
+- TargetImage: `C:\Windows\system32\lsass.exe`
+- GrantedAccess: `0x001fffff`
+- SourceProcessGUID matches the Event ID 1 process.
+- CallTrace contains multiple `ppldump.exe` frames.
+
+**Sysmon Event ID 7 — Image Load**
+
+Shortly after the LSASS access, Sysmon recorded image-load activity in `lsass.exe` involving:
+
+- `C:\Windows\System32\dbgcore.dll`
+- `C:\Windows\System32\dbghelp.dll`
+
+The dataset labels these events `Suspicious ImageLoad - Possible Memdump`.
+
+The DLLs are recorded as Microsoft-signed with valid signatures and are therefore not treated as malicious evidence by themselves.
+
+**Sysmon Event ID 5 — Process Termination**
+
+The `ppldump.exe` process later terminated at approximately `10:08:27.779`, using the same Process GUID as the Event ID 1 process.
+
+### Correlated Evidence
+
+The telemetry establishes the following sequence on host `MSEDGEWIN10`:
+
+`ppldump.exe execution → LSASS process access → LSASS image-load activity → ppldump.exe termination`
+
+Event ID 1 and Event ID 10 occurred approximately **0.13 seconds apart**, with the matching Process GUID linking them to the same process.
 
 ### Hunt Evidence
 
@@ -73,8 +109,8 @@ Other source processes observed accessing LSASS included:
 | Detection | Sysmon Event ID 10 identified LSASS process access |
 | Investigation | Hunt 01 analyzed LSASS access telemetry |
 | Finding | `ppldump.exe` accessed `lsass.exe` |
-| Assessment | High-access LSASS activity identified as suspicious |
-| Closure | Activity remains classified as suspicious based on available evidence |
+| Assessment | Correlated Sysmon telemetry confirmed LSASS credential-access activity |
+| Closure | True Positive (TP) — Confirmed LSASS Credential Access Activity |
 
 ---
 
@@ -88,17 +124,17 @@ The observed process access to `lsass.exe` is relevant to credential-access acti
 
 ## Impact Assessment
 
-Potential impact includes exposure of credentials or authentication material if the LSASS access represented credential-dumping activity.
+Observed activity is consistent with LSASS credential-access / memory-dumping behavior and could expose credentials or authentication material.
 
-The available dataset does not provide sufficient evidence in this investigation to quantify actual credential exposure.
+The available dataset does not provide sufficient evidence to quantify actual credential exposure or establish broader host compromise.
 
 ---
 
 ## Root Cause
 
-A definitive root cause cannot be established from the available telemetry alone.
+A definitive root cause or initial access vector cannot be established from the available telemetry alone.
 
-The dataset demonstrates suspicious LSASS access but does not provide sufficient corroborating evidence to determine how the activity originated.
+The observed execution chain shows `cmd.exe` launching `ppldump.exe`, followed by LSASS access and related image-load activity. User intent and the original source of the execution remain unknown.
 
 ---
 
@@ -116,30 +152,29 @@ For a real production incident, recommended containment actions would include:
 
 ## Detection Gap
 
-The existing LSASS detection successfully identified suspicious process access.
+The existing LSASS detection successfully identified and, through correlated Sysmon telemetry, confirmed the observed LSASS credential-access activity.
 
-However, additional corroborating telemetry would improve incident confirmation, including:
+Additional telemetry would improve investigation scope and impact assessment rather than the confirmation of the observed activity, including:
 
-- Process creation events
-- File creation/hash information
 - Authentication events
 - User/account context
 - Network telemetry
+- File creation and broader host telemetry
 
 ---
 
 ## Final Classification
 
-**Classification: Suspicious Activity — Not Confirmed Compromise**
+**Classification: Confirmed Detection — LSASS Credential Access Activity**
 
-The investigation identified strong suspicious telemetry involving `ppldump.exe` accessing `lsass.exe` with a high access mask.
+The investigation identified correlated Sysmon telemetry showing `ppldump.exe` execution, high-access interaction with `lsass.exe`, suspicious image-load activity, and subsequent process termination.
 
-However, based on the available EVTX evidence, the activity cannot be conclusively classified as a confirmed compromise.
+The detection is therefore classified as a True Positive (TP) for LSASS credential-access activity. This does not establish the full scope or downstream impact of a broader host compromise.
 
 ---
 
 ## Closure
 
-Case CYB-IR-001 is closed as **Suspicious Activity / Requires Additional Corroboration**.
+Case CYB-IR-001 is closed as **True Positive (TP) — Confirmed LSASS Credential Access Activity**.
 
-The finding demonstrates that the detection and hunting workflow can identify potentially malicious LSASS access and provides a basis for further investigation.
+The finding demonstrates that the detection and hunting workflow identified and corroborated LSASS credential-access activity through correlated Sysmon telemetry.
