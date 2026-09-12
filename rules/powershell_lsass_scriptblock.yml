@@ -1,4 +1,5 @@
 title: Suspicious PowerShell LSASS Dump Script
+name: powershell_lsass_scriptblock
 id: 5a7e2c91-4d63-48b0-a816-93f4c7e052bd
 status: test
 description: Detects PowerShell Script Block Logging events containing indicators associated with LSASS memory dumping through MiniDumpWriteDump.
