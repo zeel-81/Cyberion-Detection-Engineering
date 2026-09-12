@@ -1,4 +1,4 @@
-# Incident Case 02 — WinRM / PowerShell Remoting Activity
+# Incident Case 02 — WinRM Remote-Shell Execution
 
 ## Case Summary
 
@@ -6,7 +6,7 @@
 CYB-IR-002
 
 ### Incident Type
-Potential Lateral Movement
+WinRM Remote-Shell Execution / Potential Lateral Movement
 
 ### Data Source
 EVTX-ATTACK-SAMPLES
@@ -23,19 +23,18 @@ Suspicious Activity — Requires Additional Corroboration
 
 The investigation originated from telemetry associated with WinRM and PowerShell Remoting activity in the Lateral Movement dataset.
 
-A relevant event was identified in:
+The primary evidence was identified in:
 
 - File: `LM_winrm_exec_sysmon_1_winrshost.evtx`
+- Host: `DC1.insecurebank.local`
+- User: `insecurebank\Administrator`
 - Image: `C:\Windows\System32\winrshost.exe`
 - ParentImage: `C:\Windows\System32\svchost.exe`
 - CommandLine: `C:\Windows\system32\WinrsHost.exe -Embedding`
 
-Additional suspicious activity was observed in:
+The Sysmon telemetry showed a complete process execution chain:
 
-- File: `LM_sysmon_psexec_smb_meterpreter.evtx`
-- `cmd.exe` launched by `services.exe`
-- PowerShell executed with `-nop -w hidden -noni`
-- Command contained encoded/compressed PowerShell content.
+`svchost.exe → winrshost.exe → cmd.exe → ipconfig.exe`
 
 ---
 
@@ -43,7 +42,7 @@ Additional suspicious activity was observed in:
 
 WinRM and PowerShell Remoting activity associated with unusual process execution may indicate lateral movement or remote execution.
 
-The investigation therefore examined process creation telemetry for WinRM and PowerShell-related processes and suspicious command-line characteristics.
+The investigation therefore examined process creation telemetry for WinRM-related processes and their child processes.
 
 ---
 
@@ -53,41 +52,70 @@ The investigation therefore examined process creation telemetry for WinRM and Po
 
 **Sysmon Event ID 1 — Process Creation**
 
-The hunt examined:
+Three related process-creation events were identified.
 
-- `Image`
-- `ParentImage`
-- `CommandLine`
+### Event 1 — WinRM Remote Shell
 
-Relevant processes included:
+- Time: `2019-05-16 01:31:36.408`
+- Host: `DC1.insecurebank.local`
+- User: `insecurebank\Administrator`
+- Image: `C:\Windows\System32\winrshost.exe`
+- CommandLine: `C:\Windows\system32\WinrsHost.exe -Embedding`
+- ParentImage: `C:\Windows\System32\svchost.exe`
+- Integrity Level: High
+- LogonId: `0x000000000012fe05`
+- ProcessGuid: `{dfae8213-bd78-5cdc-0000-0010c7fe1200}`
 
-- `winrshost.exe`
-- `wsmprovhost.exe`
-- `powershell.exe`
+The event description identifies `winrshost.exe` as the **Host Process for WinRM's Remote Shell plugin**.
 
-### Suspicious Process Chain
+### Event 2 — Command Execution
 
-Observed activity included:
+- Time: `2019-05-16 01:31:36.443`
+- Image: `C:\Windows\System32\cmd.exe`
+- CommandLine: `C:\Windows\system32\cmd.exe /C ipconfig`
+- User: `insecurebank\Administrator`
+- ParentImage: `C:\Windows\System32\winrshost.exe`
+- ParentProcessId: `3948`
+- LogonId: `0x000000000012fe05`
 
-`services.exe → cmd.exe → powershell.exe`
+The `ParentProcessGuid` matches the `ProcessGuid` of the WinRM `winrshost.exe` process.
 
-The PowerShell execution included:
+### Event 3 — Child Process Execution
 
-- `-nop`
-- `-w hidden`
-- `-noni`
+- Time: `2019-05-16 01:31:36.447`
+- Image: `C:\Windows\System32\ipconfig.exe`
+- CommandLine: `ipconfig`
+- User: `insecurebank\Administrator`
+- ParentImage: `C:\Windows\System32\cmd.exe`
+- ParentProcessId: `3136`
+- LogonId: `0x000000000012fe05`
 
-The command also contained encoded/compressed PowerShell content.
+The `ParentProcessGuid` matches the `cmd.exe` process from Event 2.
+
+### Correlated Process Chain
+
+The telemetry therefore establishes the following process relationship:
+
+`svchost.exe → winrshost.exe → cmd.exe /C ipconfig → ipconfig.exe`
+
+The WinRM process spawned `cmd.exe`, which subsequently launched `ipconfig.exe`. The events occurred within approximately 39 milliseconds and share the same user and LogonId.
+
+This provides strong evidence of **WinRM remote-shell execution activity**.
+
+However, all observed processes are legitimate Microsoft Windows system binaries, and the telemetry does not establish whether the activity was authorized or malicious.
 
 ---
 
 ## Related Telemetry
 
-Additional PowerShell remoting-related activity was observed in:
+Additional WinRM and PowerShell-remoting samples were identified in the dataset, including:
 
 - `LM_PowershellRemoting_sysmon_1_wsmprovhost.evtx`
 - `lm_sysmon_18_remshell_over_namedpipe.evtx`
-- `LM_sysmon_3_12_13_1_SharpRDP.evtx`
+- `LM_winrm_target_wrmlogs_91_wsmanShellStarted_poorLog.evtx`
+- `RemotePowerShell_MS_Windows-Remote_Management_EventID_169.evtx`
+
+These samples were treated as separate dataset evidence because they contain different hosts and/or timestamps and were not merged into the primary incident timeline.
 
 ---
 
@@ -95,12 +123,12 @@ Additional PowerShell remoting-related activity was observed in:
 
 | Stage | Evidence |
 |---|---|
-| Detection | WinRM/PowerShell-related process telemetry identified |
-| Investigation | Sysmon Event ID 1 process creation telemetry reviewed |
-| Finding | `winrshost.exe` activity identified |
-| Additional Finding | Service-launched hidden PowerShell with encoded/compressed content |
-| Assessment | Activity considered suspicious and consistent with possible lateral movement |
-| Closure | Requires additional corroborating evidence |
+| Detection | Sysmon Event ID 1 identified `winrshost.exe` execution |
+| 01:31:36.408 | `svchost.exe` launched `winrshost.exe` |
+| 01:31:36.443 | `winrshost.exe` launched `cmd.exe /C ipconfig` |
+| 01:31:36.447 | `cmd.exe` launched `ipconfig.exe` |
+| Assessment | Correlated telemetry confirmed WinRM remote-shell execution |
+| Closure | Confirmed detection of WinRM remote-shell activity; malicious intent/lateral movement not established |
 
 ---
 
@@ -108,27 +136,38 @@ Additional PowerShell remoting-related activity was observed in:
 
 ### T1021.006 — Windows Remote Management
 
-WinRM-related process activity was identified during the hunt.
+WinRM remote-shell execution was identified through `winrshost.exe` and its child-process activity.
 
-### T1059.001 — PowerShell
+### T1059.003 — Windows Command Shell
 
-PowerShell execution was identified, including suspicious command-line characteristics.
+`cmd.exe /C ipconfig` was executed as a child of the WinRM remote-shell process.
 
 ---
 
 ## Impact Assessment
 
-Potential impact includes unauthorized remote execution or lateral movement between systems.
+The observed activity confirms execution through a WinRM remote shell.
 
-The available hunt telemetry does not provide sufficient evidence to determine whether unauthorized access to another host actually occurred.
+Potential impact includes remote command execution and possible lateral movement.
+
+However, the available telemetry does not establish:
+
+- the source host of the WinRM connection
+- whether the activity was authorized
+- whether another host was compromised
+- whether additional malicious actions occurred after `ipconfig.exe`
+
+Therefore, broader host compromise or successful unauthorized lateral movement cannot be concluded from this evidence alone.
 
 ---
 
 ## Root Cause
 
-A definitive root cause cannot be established from the available telemetry.
+A definitive root cause or initial access vector cannot be established from the available telemetry.
 
-Additional authentication, source/target host, and network telemetry would be required to determine how the observed activity originated and whether it resulted in unauthorized lateral movement.
+The evidence establishes that a WinRM remote-shell process executed commands under the `insecurebank\Administrator` account.
+
+Additional authentication, source-host, destination-host, and network telemetry would be required to determine how the session originated and whether it was unauthorized.
 
 ---
 
@@ -136,47 +175,50 @@ Additional authentication, source/target host, and network telemetry would be re
 
 For a real production incident:
 
-1. Identify the source and destination hosts.
-2. Validate the account associated with the remote activity.
-3. Isolate affected systems if unauthorized activity is confirmed.
-4. Review PowerShell and authentication telemetry.
-5. Investigate the suspicious executable or command content.
-6. Reset affected credentials if compromise is confirmed.
+1. Identify the source and destination hosts associated with the WinRM session.
+2. Validate whether `insecurebank\Administrator` was authorized to initiate the session.
+3. Review Windows authentication and WinRM/WSMan operational logs.
+4. Review subsequent process and network activity on the destination host.
+5. Isolate affected systems if unauthorized activity is confirmed.
+6. Reset affected credentials if compromise is established.
 
 ---
 
 ## Detection Gap
 
-The hunt successfully identified WinRM and PowerShell-related process activity.
+The investigation successfully identified a WinRM remote-shell process chain using Sysmon Event ID 1.
 
-However, the current investigation is primarily based on Sysmon Event ID 1 process creation telemetry.
+However, Sysmon process creation telemetry alone does not provide sufficient context to determine the source of the remote WinRM connection or whether the activity was authorized.
 
-Additional corroborating evidence should be reviewed, including:
+Additional telemetry that would improve detection confidence includes:
 
 - Windows authentication events
-- WinRM/WSMan telemetry
+- WinRM/WSMan operational logs
 - Source and destination host information
 - Network connection telemetry
-- Additional process creation events
-
-This would improve confidence when determining whether the activity represents confirmed lateral movement.
+- PowerShell logging
+- Additional process creation telemetry
 
 ---
 
 ## Final Classification
 
-**Classification: Suspicious Activity — Not Confirmed Compromise**
+**Classification: Confirmed Detection — WinRM Remote-Shell Execution Activity**
 
-The investigation identified telemetry consistent with possible WinRM/PowerShell remote execution and lateral movement.
+The investigation identified correlated Sysmon telemetry showing:
 
-The combination of service-based execution and hidden PowerShell containing encoded/compressed content is suspicious.
+`svchost.exe → winrshost.exe → cmd.exe → ipconfig.exe`
 
-However, the available evidence does not conclusively establish a confirmed compromise or successful lateral movement.
+The process hierarchy, shared LogonId, matching parent-process GUIDs, and WinRM-specific `winrshost.exe` description provide sufficient evidence to confirm **WinRM remote-shell execution activity**.
+
+This classification confirms the observed detection/activity. It does **not** establish malicious intent, unauthorized access, successful lateral movement, or broader host compromise.
 
 ---
 
 ## Closure
 
-Case CYB-IR-002 is closed as **Suspicious Activity / Requires Additional Corroboration**.
+Case CYB-IR-002 is closed as **True Positive (TP) — Confirmed WinRM Remote-Shell Execution Activity**.
 
-The case demonstrates that the threat-hunting workflow can identify potentially suspicious remote-execution activity and highlights the need for authentication and network telemetry for stronger incident confirmation.
+The case demonstrates that the threat-hunting workflow can identify and validate a WinRM remote-execution process chain using Sysmon telemetry.
+
+The primary limitation is the absence of source-host, authentication, and network telemetry required to determine whether the observed WinRM activity represented unauthorized lateral movement.
